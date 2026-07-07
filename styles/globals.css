@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #F5F0E8;
+  --cream-dark: #EDE8DE;
+  --cream-border: #E0D9CE;
+  --black: #1A1A1A;
+  --black-soft: #2C2C2C;
+  --green: #2D5A27;
+  --green-l: #4A8C3F;
+  --green-pale: rgba(45,90,39,.08);
+  --gold: #C9A84C;
+  --muted: #6B6B5A;
+  --muted-light: #9A9A88;
+  --white: #FFFFFF;
+  --shadow: 0 2px 20px rgba(26,26,26,.08);
+  --shadow-md: 0 8px 40px rgba(26,26,26,.12);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--black);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* TYPE SYSTEM */
+.s-lbl {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: .7rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.s-lbl::before { content: ""; width: 20px; height: 1.5px; background: var(--green); }
+.s-ttl {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  text-transform: uppercase;
+  line-height: 1.02;
+  color: var(--black);
+  letter-spacing: .01em;
+}
+.s-ttl .kw { color: var(--green); }
+.s-desc { font-size: .95rem; color: var(--muted); line-height: 1.8; max-width: 480px; margin-top: .8rem; }
+
+/* BUTTONS */
+.btn-g {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--green);
+  color: var(--white);
+  padding: .9rem 2.2rem;
+  font-weight: 600;
+  font-size: .85rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all .25s;
+  box-shadow: 0 2px 12px rgba(45,90,39,.2);
+  text-decoration: none;
+}
+.btn-g:hover { background: var(--green-l); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(45,90,39,.3); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  padding: .9rem 2.2rem;
+  font-size: .85rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: all .25s;
+  text-decoration: none;
+}
+.btn-outline:hover { background: var(--green); color: var(--white); }
+
+/* REVEAL ANIMATION */
+.rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.rv.in { opacity: 1; transform: none; }
+
+/* MARQUEE */
+.mqw { background: var(--green); padding: .7rem 0; overflow: hidden; }
+.mqt { display: flex; white-space: nowrap; animation: mq 22s linear infinite; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.mqi {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-size: .95rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 0 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .8rem;
+}
+.mqd { width: 4px; height: 4px; background: rgba(245,240,232,.4); border-radius: 50%; display: inline-block; }
+
+/* AURORA */
+.aurora-wrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.aurora-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .3; animation: auroraFloat 26s ease-in-out infinite; }
+.ab1 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(74,140,63,.5), transparent 70%); top: -10%; left: -10%; animation-duration: 28s; }
+.ab2 { width: 38vw; height: 38vw; background: radial-gradient(circle, rgba(45,90,39,.4), transparent 70%); bottom: -5%; right: -8%; animation-duration: 32s; animation-delay: -8s; }
+.ab3 { width: 30vw; height: 30vw; background: radial-gradient(circle, rgba(201,168,76,.25), transparent 70%); top: 40%; left: 60%; animation-duration: 24s; animation-delay: -14s; }
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(4%,6%) scale(1.08); }
+  66% { transform: translate(-3%,-4%) scale(.95); }
+}
+@media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; } }
+
+/* PROMO STRIP */
+.promo-strip {
+  background: var(--gold);
+  color: var(--white);
+  text-align: center;
+  padding: .55rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .02em;
+}
+.promo-strip:hover { background: #B8993F; }
