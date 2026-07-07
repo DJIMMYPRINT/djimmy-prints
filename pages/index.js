@@ -216,7 +216,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
+
+      {/* ── GALERIE RÉALISATIONS ── */}
+      <section ref={rv(5)} className="rv" style={{padding:'5.5rem 4vw',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
+        <p className="s-lbl">Nos réalisations</p>
+        <h2 className="s-ttl">Travail <span className="kw">concret, résultats réels</span></h2>
+        <p className="s-desc">Hôpitaux, restaurants, entreprises industrielles — voici ce qu'on livre.</p>
+
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:'1rem',marginTop:'3rem'}}>
+          {[
+            {src:'https://ivxvzyokijsatdlonpec.supabase.co/storage/v1/object/public/Image/IMG_0590.jpeg', label:'Réalisation client — Impression professionnelle', tag:'Transfert numérique'},
+            {src:'https://ivxvzyokijsatdlonpec.supabase.co/storage/v1/object/public/Image/IMG_0591.jpeg', label:'Réalisation client — Logo personnalisé', tag:'Sérigraphie'},
+            {src:'https://ivxvzyokijsatdlonpec.supabase.co/storage/v1/object/public/Image/IMG_0592.jpeg', label:'Réalisation client — Uniforme complet', tag:'Broderie'},
+            {src:'/photo1.png', label:'Ambulancier · Établissement Hospitalier Rouane', tag:'Transfert numérique'},
+            {src:'/photo5.jpg', label:'Milano Food · Polo noir logo couleur', tag:'Transfert numérique'},
+            {src:'/photo6.jpg', label:'FBI Emballage · Gilet multi-poches', tag:'Sérigraphie'},
+          ].map((p,i) => (
+            <div key={i} ref={rv(40+i)} className="rv" style={{
+              borderRadius:'8px',overflow:'hidden',
+              border:'1.5px solid var(--cream-border)',
+              background:'var(--white)',
+              transition:'all .3s',
+              transitionDelay:`${i*0.07}s`,
+            }}
+              onMouseOver={e=>{e.currentTarget.style.transform='translateY(-4px)';e.currentTarget.style.boxShadow='var(--shadow-md)'}}
+              onMouseOut={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
+            >
+              <div style={{aspectRatio:'4/3',overflow:'hidden',background:'var(--cream)'}}>
+                <img src={p.src} alt={p.label}
+                  style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .4s'}}
+                  onMouseOver={e=>e.currentTarget.style.transform='scale(1.04)'}
+                  onMouseOut={e=>e.currentTarget.style.transform='none'}
+                />
+              </div>
+              <div style={{padding:'1rem 1.2rem'}}>
+                <span style={{fontSize:'.65rem',background:'var(--green-pale)',color:'var(--green)',padding:'.2rem .6rem',borderRadius:'100px',fontWeight:600}}>{p.tag}</span>
+                <p style={{fontSize:'.82rem',color:'var(--muted)',marginTop:'.5rem',lineHeight:1.5}}>{p.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */
       <section ref={rv(3)} className="rv" style={{padding:'5.5rem 4vw',position:'relative',zIndex:1}}>
         <p className="s-lbl">Témoignages</p>
         <h2 className="s-ttl">Ils nous font <span className="kw">confiance</span></h2>
