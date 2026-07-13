@@ -9,19 +9,19 @@ const PRODUCTS = [
     id: 'polo', emoji: '👔', name: 'Polo Personnalisé', price: 2400,
     desc: 'Piqué coton 220g/m². Col côtelé, fermeture 3 boutons. Logo brodé ou imprimé recto/verso.',
     techniques: ['Broderie', 'Sérigraphie', 'Transfert'], popular: true,
-    images: [`${SB}/polo1.jpeg`, `${SB}/polo2.png`, `${SB}/polo3.png`]
+    images: [`${SB}/polo1.jpeg`]
   },
   {
     id: 'tshirt', emoji: '👕', name: 'T-shirt Personnalisé', price: 1950,
     desc: 'Coton 180g/m². Col rond renforcé. Impression haute résolution recto/verso.',
     techniques: ['Sérigraphie', 'Transfert', 'Sublimation'],
-    images: [`${SB}/tshirt1.jpeg`, `${SB}/tshirtbeie2.jpeg`]
+    images: [`${SB}/tshirt1.jpeg`]
   },
   {
     id: 'combinaison', emoji: '🦺', name: 'Combinaison Personnalisée', price: 4900,
     desc: 'Tissu professionnel résistant. Multi-poches, bretelles réglables. Idéal industrie & BTP.',
     techniques: ['Broderie', 'Sérigraphie'], popular: true,
-    images: [`${SB}/combinaison1.png`, `${SB}/combinaison2.jpeg`]
+    images: [`${SB}/combinaison1.png`]
   },
   {
     id: 'veste', emoji: '🧥', name: 'Veste de Travail', price: 3000,
@@ -33,13 +33,13 @@ const PRODUCTS = [
     id: 'gilet', emoji: '🦺', name: 'Gilet Avec Col', price: 2700,
     desc: 'Gilet professionnel avec col zippé. Multi-poches. Broderie ou impression logo.',
     techniques: ['Broderie', 'Sérigraphie'],
-    images: [`${SB}/gilet1.jpeg`, `${SB}/gilet2.jpeg`]
+    images: [`${SB}/gilet1.jpeg`]
   },
   {
     id: 'gilet-sans', emoji: '🦺', name: 'Gilet Sans Col', price: 2300,
     desc: 'Gilet léger sans col, zippé. Confort optimal. Personnalisation logo incluse.',
     techniques: ['Broderie', 'Sérigraphie'],
-    images: [`${SB}/gilet1.jpeg`]
+    images: [`${SB}/gilet2.jpeg`]
   },
   {
     id: 'tablier', emoji: '🥼', name: 'Tablier / Blouse', price: 2200,
