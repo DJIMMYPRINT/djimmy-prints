@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Aurora from './Aurora'
-
-const WA = '213560836384'
+import { WA, PHONE_DISPLAY, EMAIL, ADDRESS, SITE_URL } from '../lib/constants'
 
 export default function Layout({ children }) {
   const [scrolled, setScrolled] = useState(false)
@@ -52,7 +51,7 @@ export default function Layout({ children }) {
         </Link>
 
         {/* Desktop Links */}
-        <ul style={{display:'flex',gap:0,listStyle:'none',alignItems:'center',margin:0}}>
+        <ul className="nav-desktop-links" style={{display:'flex',gap:0,listStyle:'none',alignItems:'center',margin:0}}>
           {[
             { label: 'Accueil', href: '/' },
             { label: 'Catalogue', href: '/catalogue' },
@@ -102,7 +101,40 @@ export default function Layout({ children }) {
             </a>
           </li>
         </ul>
+
+        {/* Mobile burger */}
+        <button
+          className={`nav-burger${menuOpen ? ' open' : ''}`}
+          onClick={() => setMenuOpen(o => !o)}
+          aria-label="Menu"
+        >
+          <span /><span /><span />
+        </button>
       </nav>
+
+      {/* Mobile menu panel */}
+      {menuOpen && (
+        <div className="mobile-menu-panel">
+          {[
+            { label: 'Accueil', href: '/' },
+            { label: 'Catalogue', href: '/catalogue' },
+            { label: 'Commande', href: '/commande' },
+            { label: 'Contact', href: '/contact' },
+          ].map(({ label, href }) => (
+            <Link key={href} href={href} className={isActive(href) ? 'active' : ''} onClick={() => setMenuOpen(false)}>
+              {label}
+            </Link>
+          ))}
+          <a
+            className="mm-cta"
+            href={`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`}
+            target="_blank" rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+          >
+            💬 Devis Gratuit sur WhatsApp
+          </a>
+        </div>
+      )}
 
       {/* PAGE CONTENT */}
       <main style={{position:'relative',zIndex:1}}>
@@ -117,7 +149,7 @@ export default function Layout({ children }) {
         position: 'relative',
         zIndex: 1,
       }}>
-        <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr',gap:'3rem',marginBottom:'3rem'}}>
+        <div className="footer-grid" style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr',gap:'3rem',marginBottom:'3rem'}}>
           {/* Brand */}
           <div>
             <div style={{display:'flex',alignItems:'center',gap:'.7rem',marginBottom:'1rem'}}>
@@ -154,9 +186,9 @@ export default function Layout({ children }) {
           {/* Contact */}
           <div>
             <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Contact</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📍 Aïn Bénian, Alger</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📞 0560 83 63 84</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'1rem'}}>📧 djimmyprints@gmail.com</p>
+            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📍 {ADDRESS}</p>
+            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📞 {PHONE_DISPLAY}</p>
+            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'1rem'}}>📧 {EMAIL}</p>
             <a
               href={`https://wa.me/${WA}`}
               target="_blank" rel="noopener noreferrer"
@@ -168,8 +200,8 @@ export default function Layout({ children }) {
         </div>
 
         <div style={{borderTop:'1px solid rgba(245,240,232,.08)',paddingTop:'1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
-          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>© 2026 Djimmy Prints — Aïn Bénian, Alger</span>
-          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>djimmyprints.xyz</span>
+          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>© 2026 Djimmy Prints — {ADDRESS}</span>
+          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>{SITE_URL}</span>
         </div>
       </footer>
     </>
