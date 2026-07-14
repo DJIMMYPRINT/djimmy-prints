@@ -1,26 +1,8 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-
-const PRODUCTS = [
-  { emoji: '👕', name: 'Polo', price: 1200, desc: 'Piqué coton 220g/m². Col côtelé, fermeture 3 boutons.', techniques: ['Broderie','Sérigraphie','Transfert'], popular: true },
-  { emoji: '👕', name: 'T-shirt', price: 950, desc: 'Coton 180g/m². Col rond renforcé. Idéal pour équipes.', techniques: ['Sérigraphie','Transfert','Sublimation'] },
-  { emoji: '👔', name: 'Chemise', price: 1800, desc: 'Popeline coton. Col classique. Finition professionnelle.', techniques: ['Broderie','Transfert'] },
-  { emoji: '🧥', name: 'Veste', price: 3500, desc: 'Softshell imperméable. Idéal pour équipes terrain.', techniques: ['Broderie','Flocage'] },
-  { emoji: '🥼', name: 'Tablier', price: 900, desc: 'Coton épais 280g/m². Protection totale, look cuisine pro.', techniques: ['Broderie','Sérigraphie'], popular: true },
-  { emoji: '🦺', name: 'Gilet', price: 1400, desc: 'Polyester haute visibilité ou style corporate.', techniques: ['Broderie','Sérigraphie'] },
-  { emoji: '🧢', name: 'Casquette', price: 650, desc: 'Coton structuré. Réglable, 6 panneaux.', techniques: ['Broderie','Flocage'] },
-  { emoji: '👖', name: 'Pantalon', price: 2200, desc: 'Tissu pro résistant. Tailles S→3XL. Multiple coloris.', techniques: ['Broderie','Transfert'] },
-]
-
-const VOLUME_DISCOUNTS = [
-  { qty: '20–49', dis: '0%', label: 'Tarif standard' },
-  { qty: '50–99', dis: '5%', label: 'Remise volume' },
-  { qty: '100–199', dis: '10%', label: 'Remise professionnelle' },
-  { qty: '200+', dis: '15%', label: 'Tarif entreprise' },
-]
-
-const SIZES = ['XS','S','M','L','XL','XXL','3XL']
+import { PRODUCTS } from '../lib/products'
+import { VOLUME_DISCOUNTS } from '../lib/constants'
 
 export default function Catalogue() {
   const [activeProduct, setActiveProduct] = useState(PRODUCTS[0])
@@ -94,7 +76,7 @@ export default function Catalogue() {
 
       {/* CATALOGUE LAYOUT */}
       <div style={{padding:'0 4vw 5rem',position:'relative',zIndex:1}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4rem',alignItems:'start'}}>
+        <div className="cat-layout" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4rem',alignItems:'start'}}>
 
           {/* ── CONFIGURATEUR ── */}
           <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'8px',overflow:'hidden'}}>
@@ -268,7 +250,7 @@ export default function Catalogue() {
               <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'Anton',fontSize:'.9rem',textTransform:'uppercase',letterSpacing:'.04em'}}>
                 📦 Remises volume
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
+              <div className="size-chart-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
                 {VOLUME_DISCOUNTS.map((d,i) => (
                   <div key={d.qty} style={{
                     padding:'1rem',textAlign:'center',
