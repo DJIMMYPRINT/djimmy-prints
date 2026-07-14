@@ -1,6 +1,5 @@
 import Head from 'next/head'
-
-const WA = '213560836384'
+import { WA, PHONE_DISPLAY, EMAIL, ADDRESS } from '../lib/constants'
 
 const FAQ = [
   { q: 'Quel est le minimum de commande ?', r: '20 pièces minimum. Pour les commandes inférieures, contactez-nous pour un devis personnalisé.' },
@@ -23,7 +22,7 @@ export default function Contact() {
         <p className="s-lbl">Contact & FAQ</p>
         <h1 className="s-ttl">On est là pour <span className="kw">vous aider</span></h1>
 
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5rem',marginTop:'4rem',alignItems:'start'}}>
+        <div className="contact-layout" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5rem',marginTop:'4rem',alignItems:'start'}}>
           {/* LEFT — Contact */}
           <div>
             <h2 style={{fontFamily:'Anton',fontSize:'1.4rem',textTransform:'uppercase',marginBottom:'2rem'}}>Nous contacter</h2>
@@ -31,9 +30,9 @@ export default function Contact() {
             {/* Cards contact */}
             {[
               { ic:'💬', title:'WhatsApp', sub:'Réponse en moins de 2h', action:'Écrire maintenant', href:`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`, highlight:true },
-              { ic:'📞', title:'Téléphone', sub:'0560 83 63 84', action:'Appeler', href:'tel:+213560836384' },
-              { ic:'📧', title:'Email', sub:'djimmyprints@gmail.com', action:'Envoyer un email', href:'mailto:djimmyprints@gmail.com' },
-              { ic:'📍', title:'Adresse', sub:'Aïn Bénian, Alger, Algérie', action:'Voir sur la carte', href:'https://www.google.com/maps?q=Aïn+Bénian+Alger' },
+              { ic:'📞', title:'Téléphone', sub:PHONE_DISPLAY, action:'Appeler', href:`tel:+${WA}` },
+              { ic:'📧', title:'Email', sub:EMAIL, action:'Envoyer un email', href:`mailto:${EMAIL}` },
+              { ic:'📍', title:'Adresse', sub:`${ADDRESS}, Algérie`, action:'Voir sur la carte', href:'https://www.google.com/maps?q=Aïn+Bénian+Alger' },
             ].map((c,i) => (
               <a key={i} href={c.href} target={c.href.startsWith('http')?'_blank':'_self'} rel="noopener noreferrer"
                 style={{
