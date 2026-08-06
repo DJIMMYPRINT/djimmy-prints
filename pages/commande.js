@@ -1,14 +1,20 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { PRODUCTS } from '../lib/products'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS, SUPABASE_IMG_BASE } from '../lib/constants'
+import { fetchProducts } from '../lib/supabase/fetchProducts'
+import { supabaseBrowser } from '../lib/supabase/browserClient'
 
-export default function Commande() {
+export async function getServerSideProps(ctx) {
+  const products = await fetchProducts(ctx)
+  return { props: { products } }
+}
+
+export default function Commande({ products }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [order, setOrder] = useState({
-    prods: [],          // [{name, emoji, price, qty, color, sizes:{S:2,M:3,...}}]
+    prods: [],          // [{id, name, emoji, price, qty, color, sizes:{S:2,M:3,...}}]
     technique: '',
     logo: null,
     logoName: '',
@@ -19,14 +25,14 @@ export default function Commande() {
   const [done, setDone] = useState(false)
 
   // Add product to order
-  const [selProd, setSelProd] = useState(PRODUCTS[0])
+  const [selProd, setSelProd] = useState(products[0])
   const [selColor, setSelColor] = useState('Blanc')
   const [selSizes, setSelSizes] = useState({})
 
   // Preselect the product passed via /commande?produit=<id> (e.g. from the homepage "Commander ce produit" link)
   useEffect(() => {
     if (!router.isReady) return
-    const found = PRODUCTS.find(p => p.id === router.query.produit)
+    const found = products.find(p => p.id === router.query.produit)
     if (found) setSelProd(found)
   }, [router.isReady, router.query.produit])
 
@@ -104,6 +110,30 @@ export default function Commande() {
 
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank')
     if(typeof fbq!=='undefined') fbq('track','Purchase',{value:final,currency:'DZD'})
+
+    // Best-effort order record in the DB, in parallel with the WhatsApp send above —
+    // WhatsApp is the order channel of record, so a DB failure here must never
+    // block or interrupt the flow the customer just completed.
+    supabaseBrowser().from('orders').insert({
+      nom: form.nom,
+      telephone: form.tel,
+      entreprise: form.entreprise || null,
+      email: form.email || null,
+      wilaya: form.wilaya,
+      adresse: form.adresse,
+      technique: order.technique || null,
+      logo_filename: order.logoName || null,
+      notes: order.notes || null,
+      line_items: order.prods,
+      pay_mode: payMode,
+      subtotal: sub,
+      volume_discount_rate: disRate,
+      volume_discount_amount: volDis,
+      payment_discount_amount: payDis,
+      total_qty: totalQty,
+      total: final,
+    }).then(({ error }) => { if (error) console.error('Order DB insert failed:', error) })
+
     setDone(true)
   }
 
@@ -116,6 +146,12 @@ export default function Commande() {
     transition:'border-color .2s',
   }
   const labelStyle = { display:'block', fontSize:'.75rem', fontWeight:600, letterSpacing:'.05em', textTransform:'uppercase', color:'var(--muted)', marginBottom:'.4rem' }
+
+  if (!products.length) return (
+    <div style={{padding:'9rem 4vw 5rem',textAlign:'center',position:'relative',zIndex:1}}>
+      <p className="s-desc">Aucun produit disponible pour le moment.</p>
+    </div>
+  )
 
   if(done) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'8rem 4vw',position:'relative',zIndex:1}}>
@@ -174,7 +210,7 @@ export default function Commande() {
 
                 {/* Product picker */}
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'1.2rem',marginBottom:'2rem'}}>
-                  {PRODUCTS.map(p => (
+                  {products.map(p => (
                     <div key={p.name} onClick={()=>setSelProd(p)} style={{
                       border:'1.5px solid', borderRadius:'10px', cursor:'pointer',
                       overflow:'hidden', background:'var(--white)', transition:'all .2s',

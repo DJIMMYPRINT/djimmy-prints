@@ -1,11 +1,24 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
-import { PRODUCTS } from '../lib/products'
 import { WA, SUPABASE_IMG_BASE, VOLUME_DISCOUNTS } from '../lib/constants'
+import { fetchProducts } from '../lib/supabase/fetchProducts'
 
-export default function Home() {
-  const [selected, setSelected] = useState(PRODUCTS[0])
+export async function getServerSideProps(ctx) {
+  const products = await fetchProducts(ctx)
+  return { props: { products } }
+}
+
+export default function Home({ products }) {
+  const [selected, setSelected] = useState(products[0])
+
+  if (!selected) {
+    return (
+      <div style={{padding:'9rem 4vw 5rem',textAlign:'center',position:'relative',zIndex:1}}>
+        <p className="s-desc">Aucun produit disponible pour le moment.</p>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -27,7 +40,7 @@ export default function Home() {
           {/* GAUCHE — Liste produits */}
           <div>
             <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-              {PRODUCTS.map(p => (
+              {products.map(p => (
                 <div key={p.id} onClick={()=>setSelected(p)} style={{
                   background: selected.id===p.id ? 'var(--green-pale)' : 'var(--white)',
                   border: `1.5px solid ${selected.id===p.id ? 'var(--green)' : 'var(--cream-border)'}`,

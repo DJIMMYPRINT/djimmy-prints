@@ -1,11 +1,16 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import { PRODUCTS } from '../lib/products'
 import { VOLUME_DISCOUNTS, SUPABASE_IMG_BASE } from '../lib/constants'
+import { fetchProducts } from '../lib/supabase/fetchProducts'
 
-export default function Catalogue() {
-  const [activeProduct, setActiveProduct] = useState(PRODUCTS[0])
+export async function getServerSideProps(ctx) {
+  const products = await fetchProducts(ctx)
+  return { props: { products } }
+}
+
+export default function Catalogue({ products }) {
+  const [activeProduct, setActiveProduct] = useState(products[0])
   const [photoFailed, setPhotoFailed] = useState(false)
   useEffect(() => { setPhotoFailed(false) }, [activeProduct])
   const [vizMode, setVizMode] = useState('visitor') // visitor | client
@@ -77,6 +82,14 @@ export default function Catalogue() {
     productImg.src = `${SUPABASE_IMG_BASE}/${activeProduct.photo}`
   }
 
+  if (!activeProduct) {
+    return (
+      <div style={{padding:'9rem 4vw 5rem',textAlign:'center',position:'relative',zIndex:1}}>
+        <p className="s-desc">Aucun produit disponible pour le moment.</p>
+      </div>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -116,7 +129,7 @@ export default function Catalogue() {
 
             {/* Product selector */}
             <div style={{padding:'1rem 1.5rem',display:'flex',gap:'.5rem',flexWrap:'wrap',borderBottom:'1px solid var(--cream-border)'}}>
-              {PRODUCTS.map(p => (
+              {products.map(p => (
                 <button key={p.name} onClick={() => setActiveProduct(p)} style={{
                   padding:'.3rem .7rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',fontWeight:500,
                   borderColor: activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)',
@@ -235,7 +248,7 @@ export default function Catalogue() {
             <h2 className="s-ttl" style={{marginBottom:'2rem'}}>Nos <span className="kw">produits & prix</span></h2>
 
             <div style={{display:'flex',flexDirection:'column',gap:'1rem',marginBottom:'3rem'}}>
-              {PRODUCTS.map(p => (
+              {products.map(p => (
                 <div key={p.name} onClick={()=>setActiveProduct(p)} style={{
                   background: activeProduct.name===p.name ? 'var(--green-pale)' : 'var(--white)',
                   border: `1.5px solid ${activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)'}`,
