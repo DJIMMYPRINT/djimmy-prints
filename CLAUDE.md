@@ -23,14 +23,11 @@ There is no lint script, no test suite, and no TypeScript checker configured in 
 
 **Important naming trap:** the nav's "Catalogue" link (`/catalogue`) does *not* point to the product listing — it opens the drag-and-drop logo configurator ("Studio logo"). The actual scrollable product list with prices lives on the homepage, `pages/index.js`. Don't assume routes match their nav label without checking.
 
-**Data model — and a known inconsistency to watch for:** `lib/products.js` exports a `PRODUCTS` array with a comment claiming it's the single source of truth shared by the catalogue and order wizard. In practice:
-- `pages/commande.js` (order wizard) imports and uses `lib/products.js` correctly.
-- `pages/catalogue.js` (logo configurator) also imports it correctly.
-- `pages/index.js` (homepage product list) defines its **own separate, hand-duplicated** `PRODUCTS` array inline instead of importing the shared one.
+**Data model:** `lib/products.js` exports the single `PRODUCTS` array (each with `id`, `emoji`, `name`, `photo`, `price`, `desc`, `techniques`, optional `popular`) used by all three product-facing pages — `pages/index.js` (homepage list), `pages/catalogue.js` (logo configurator), and `pages/commande.js` (order wizard). This used to be duplicated by hand in `pages/index.js` with its own drifted copy (which had, among other mismatches, the wrong photo wired up for "Pantalon") — that duplication has been removed; `index.js` now imports from `lib/products.js` like the other pages. When adding, removing, or repricing a product, edit `lib/products.js` only.
 
-If you change a product's name, price, description, or photo, you must update it in **both** `lib/products.js` and the inline copy at the top of `pages/index.js`, or the homepage and the rest of the site will silently disagree. When touching product data, prefer fixing this duplication (have `index.js` import from `lib/products.js`) over perpetuating it, unless the two lists need to diverge for a reason.
+`pages/commande.js` reads an optional `?produit=<id>` query string (matched against `PRODUCTS[].id`) to preselect a product — this is what the homepage's "Commander ce produit" link relies on. Keep product `id`s stable since they're referenced in that URL.
 
-**`lib/constants.js`** is the real single source of truth for site-wide values: WhatsApp number (`WA`), display phone, email, address, the Supabase Storage base URL for product photos (`SUPABASE_IMG_BASE`), and shared option lists (`WILAYAS` — all 58 Algerian provinces, `SIZES`, `COLORS`, `TECHNIQUES`, `VOLUME_DISCOUNTS`). Always import from here rather than hardcoding the WhatsApp number or a wilaya list again — `pages/index.js` is the one exception that hardcodes its own copies of some of this (`SB` base URL, `VOLUME_DISCOUNTS`), a symptom of the same duplication described above.
+**`lib/constants.js`** is the single source of truth for site-wide values: WhatsApp number (`WA`), display phone, email, address, the Supabase Storage base URL for product photos (`SUPABASE_IMG_BASE`), and shared option lists (`WILAYAS` — all 58 Algerian provinces, `SIZES`, `COLORS`, `TECHNIQUES`, `VOLUME_DISCOUNTS`). Always import from here rather than hardcoding the WhatsApp number, image base URL, or discount tiers again.
 
 **Product photos** are hosted on Supabase Storage (public bucket `IMAGE`, project `ivxvzyokijsatdlonpec`), referenced as `${SUPABASE_IMG_BASE}/${photo}`, *not* served from `public/`. Every `<img>` for a product photo has an `onError` fallback that swaps in the product's `emoji` — preserve this pattern when adding new product images so a missing/renamed Supabase file degrades gracefully instead of showing a broken image icon. The `public/` folder only holds the logo and a few unused legacy photos.
 
@@ -41,3 +38,9 @@ If you change a product's name, price, description, or photo, you must update it
 **Locale:** all UI copy is French (`<html lang="fr">`), prices are formatted with `toLocaleString('fr-DZ')` and displayed in DA (Algerian Dinar). Keep new user-facing strings in French and follow the same number formatting.
 
 **Analytics:** Google Analytics and Meta (Facebook) Pixel are wired up in `pages/_document.js` with hardcoded IDs, plus an inline `fbq('track','Purchase', ...)` call fired in `commande.js` on order submit. Be careful not to duplicate or break these snippets.
+
+## Repo hygiene
+
+A `.gitignore` now excludes `node_modules/`, `.next/`, and `.env*` — this matters once a backend is added, since env files will hold Supabase service keys/DB credentials that must never be committed. `package-lock.json` is checked in for reproducible installs.
+
+Next.js is pinned to `14.2.35` (bumped from `14.2.3`, which had multiple known critical CVEs — cache poisoning, middleware auth bypass, SSRF — fixed in this patch release; run `npm audit` to check current status). Going to Next 16 to clear the remaining `npm audit` findings is a breaking major-version upgrade (different defaults, dependency changes) and hasn't been done — treat it as a deliberate, separate decision, not something to pull in incidentally while working on something else.

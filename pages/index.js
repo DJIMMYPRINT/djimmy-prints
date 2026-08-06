@@ -1,78 +1,11 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { PRODUCTS } from '../lib/products'
+import { WA, SUPABASE_IMG_BASE, VOLUME_DISCOUNTS } from '../lib/constants'
 
-const SB = 'https://ivxvzyokijsatdlonpec.supabase.co/storage/v1/object/public/IMAGE'
-
-const PRODUCTS = [
-  {
-    id: 'polo', emoji: '👔', name: 'Polo Personnalisé', price: 2400,
-    desc: 'Piqué coton 220g/m². Col côtelé, fermeture 3 boutons. Logo brodé ou imprimé recto/verso.',
-    techniques: ['Broderie', 'Sérigraphie', 'Transfert'], popular: true,
-    images: [`${SB}/polo1.jpeg`]
-  },
-  {
-    id: 'tshirt', emoji: '👕', name: 'T-shirt Personnalisé', price: 1950,
-    desc: 'Coton 180g/m². Col rond renforcé. Impression haute résolution recto/verso.',
-    techniques: ['Sérigraphie', 'Transfert', 'Sublimation'],
-    images: [`${SB}/tshirt1.jpeg`]
-  },
-  {
-    id: 'combinaison', emoji: '🦺', name: 'Combinaison Personnalisée', price: 4900,
-    desc: 'Tissu professionnel résistant. Multi-poches, bretelles réglables. Idéal industrie & BTP.',
-    techniques: ['Broderie', 'Sérigraphie'], popular: true,
-    images: [`${SB}/combinaison1.png`]
-  },
-  {
-    id: 'veste', emoji: '🧥', name: 'Veste de Travail', price: 3000,
-    desc: 'Tissu robuste multi-poches. Logo brodé poitrine et dos. Idéal équipes terrain.',
-    techniques: ['Broderie', 'Transfert'],
-    images: [`${SB}/veste1.jpeg`]
-  },
-  {
-    id: 'gilet', emoji: '🦺', name: 'Gilet Avec Col', price: 2700,
-    desc: 'Gilet professionnel avec col zippé. Multi-poches. Broderie ou impression logo.',
-    techniques: ['Broderie', 'Sérigraphie'],
-    images: [`${SB}/gilet1.jpeg`]
-  },
-  {
-    id: 'gilet-sans', emoji: '🦺', name: 'Gilet Sans Col', price: 2300,
-    desc: 'Gilet léger sans col, zippé. Confort optimal. Personnalisation logo incluse.',
-    techniques: ['Broderie', 'Sérigraphie'],
-    images: [`${SB}/gilet2.jpeg`]
-  },
-  {
-    id: 'tablier', emoji: '🥼', name: 'Tablier / Blouse', price: 2200,
-    desc: 'Blouse professionnelle coton. Idéal secteur médical, restauration, beauté.',
-    techniques: ['Broderie', 'Transfert'],
-    images: [`${SB}/tablier1.jpeg`]
-  },
-  {
-    id: 'casquette', emoji: '🧢', name: 'Casquette Brodée', price: 1150,
-    desc: 'Coton structuré 6 panneaux. Broderie haute définition. Taille réglable.',
-    techniques: ['Broderie'],
-    images: [`${SB}/casquette1.png`]
-  },
-  {
-    id: 'pantalon', emoji: '👖', name: 'Pantalon de Travail', price: 2500,
-    desc: 'Tissu pro résistant. Multi-poches cargo. Tailles S→3XL. Logo brodé ou imprimé.',
-    techniques: ['Broderie', 'Transfert'],
-    images: [`${SB}/combinaison2.jpeg`]
-  },
-]
-
-const VOLUME_DISCOUNTS = [
-  { qty: '20–49', dis: '0%', label: 'Tarif standard', color: 'var(--muted)' },
-  { qty: '50–99', dis: '5%', label: 'Remise volume', color: 'var(--green)' },
-  { qty: '100–199', dis: '10%', label: 'Remise pro', color: 'var(--green)' },
-  { qty: '200+', dis: '15%', label: 'Tarif entreprise', color: 'var(--green)' },
-]
-
-export default function Catalogue() {
+export default function Home() {
   const [selected, setSelected] = useState(PRODUCTS[0])
-  const [imgIdx, setImgIdx] = useState(0)
-
-  useEffect(() => { setImgIdx(0) }, [selected])
 
   return (
     <>
@@ -110,7 +43,7 @@ export default function Catalogue() {
                   <div style={{display:'flex',alignItems:'center',gap:'1.2rem'}}>
                     {/* Product image thumbnail */}
                     <div style={{width:64,height:64,borderRadius:'8px',overflow:'hidden',background:'var(--cream)',flexShrink:0,border:'1px solid var(--cream-border)'}}>
-                      <img src={p.images[0]} alt={p.name}
+                      <img src={`${SUPABASE_IMG_BASE}/${p.photo}`} alt={p.name}
                         style={{width:'100%',height:'100%',objectFit:'cover'}}
                         onError={e=>{e.target.style.display='none';e.target.parentNode.innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">${p.emoji}</div>`}}
                       />
@@ -141,8 +74,8 @@ export default function Catalogue() {
               {/* Image principale */}
               <div style={{aspectRatio:'1',background:'var(--cream)',position:'relative',overflow:'hidden'}}>
                 <img
-                  key={selected.images[imgIdx]}
-                  src={selected.images[imgIdx]}
+                  key={selected.photo}
+                  src={`${SUPABASE_IMG_BASE}/${selected.photo}`}
                   alt={selected.name}
                   style={{width:'100%',height:'100%',objectFit:'cover',transition:'opacity .3s'}}
                   onError={e=>{e.target.style.display='none';e.target.parentNode.innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:6rem">${selected.emoji}</div>`}}
@@ -153,23 +86,6 @@ export default function Catalogue() {
                   </div>
                 )}
               </div>
-
-              {/* Thumbnails */}
-              {selected.images.length > 1 && (
-                <div style={{display:'flex',gap:'.5rem',padding:'.8rem',borderBottom:'1px solid var(--cream-border)'}}>
-                  {selected.images.map((img,i)=>(
-                    <div key={i} onClick={()=>setImgIdx(i)} style={{
-                      width:52,height:52,borderRadius:'6px',overflow:'hidden',cursor:'pointer',flexShrink:0,
-                      border:`2px solid ${imgIdx===i?'var(--green)':'var(--cream-border)'}`,
-                      background:'var(--cream)',
-                    }}>
-                      <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}
-                        onError={e=>{e.target.style.display='none'}}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
 
               {/* Infos produit */}
               <div style={{padding:'1.5rem'}}>
@@ -195,7 +111,7 @@ export default function Catalogue() {
                   Commander ce produit
                 </Link>
 
-                <a href={`https://wa.me/213560836384?text=Bonjour, je suis intéressé par : ${selected.name} (${selected.price.toLocaleString()} DA/u). Pouvez-vous me faire une offre ?`}
+                <a href={`https://wa.me/${WA}?text=Bonjour, je suis intéressé par : ${selected.name} (${selected.price.toLocaleString()} DA/u). Pouvez-vous me faire une offre ?`}
                   target="_blank" rel="noopener noreferrer"
                   style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',background:'#25D366',color:'#fff',padding:'1rem',borderRadius:'8px',fontWeight:700,fontSize:'.9rem',textDecoration:'none',letterSpacing:'.05em',textTransform:'uppercase'}}>
                   💬 Demander un devis WhatsApp
@@ -211,7 +127,7 @@ export default function Catalogue() {
               <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
                 {VOLUME_DISCOUNTS.map((d,i)=>(
                   <div key={d.qty} style={{padding:'.8rem .5rem',textAlign:'center',borderRight:i<3?'1px solid var(--cream-border)':'none'}}>
-                    <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:d.color,lineHeight:1}}>{d.dis}</div>
+                    <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:i>0?'var(--green)':'var(--muted)',lineHeight:1}}>{d.dis}</div>
                     <div style={{fontSize:'.65rem',fontWeight:700,color:'var(--black)',margin:'.2rem 0'}}>{d.qty}</div>
                     <div style={{fontSize:'.6rem',color:'var(--muted)'}}>{d.label}</div>
                   </div>

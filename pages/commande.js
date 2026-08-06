@@ -1,9 +1,11 @@
 import Head from 'next/head'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { PRODUCTS } from '../lib/products'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS, SUPABASE_IMG_BASE } from '../lib/constants'
 
 export default function Commande() {
+  const router = useRouter()
   const [step, setStep] = useState(1)
   const [order, setOrder] = useState({
     prods: [],          // [{name, emoji, price, qty, color, sizes:{S:2,M:3,...}}]
@@ -20,6 +22,13 @@ export default function Commande() {
   const [selProd, setSelProd] = useState(PRODUCTS[0])
   const [selColor, setSelColor] = useState('Blanc')
   const [selSizes, setSelSizes] = useState({})
+
+  // Preselect the product passed via /commande?produit=<id> (e.g. from the homepage "Commander ce produit" link)
+  useEffect(() => {
+    if (!router.isReady) return
+    const found = PRODUCTS.find(p => p.id === router.query.produit)
+    if (found) setSelProd(found)
+  }, [router.isReady, router.query.produit])
 
   const addProduct = () => {
     const totalQty = Object.values(selSizes).reduce((a,b)=>a+(+b||0),0)
