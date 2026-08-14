@@ -5,6 +5,11 @@
 -- one-time setup step. Kept here for documentation/history.
 -- ============================================================
 
+-- Reset first, in case an earlier partial/duplicate attempt left things
+-- in a mixed state (safe: these tables only ever hold seed/test data so far).
+drop table if exists public.products cascade;
+drop table if exists public.orders cascade;
+
 create table public.products (
   id           text primary key,        -- stable slug, e.g. 'polo' — referenced by /commande?produit=<id>
   name         text not null,
