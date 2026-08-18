@@ -93,6 +93,15 @@ export default function Commande() {
       '_djimmyprints.xyz_',
     ].filter(Boolean).join('\n')
 
+    // Best-effort: log the order to Supabase so sales are centralized, but
+    // never let a Supabase hiccup block the WhatsApp send — that's the part
+    // the business actually depends on.
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client: form, order, totals: { sub, volDis, disRate, payDis, final, totalQty, payLabel } }),
+    }).catch(err => console.error('Order logging failed:', err))
+
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank')
     if(typeof fbq!=='undefined') fbq('track','Purchase',{value:final,currency:'DZD'})
     setDone(true)
