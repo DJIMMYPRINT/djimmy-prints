@@ -99,7 +99,7 @@ export default function Commande() {
     fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client: form, order, totals: { sub, volDis, disRate, payDis, final, totalQty, payLabel } }),
+      body: JSON.stringify({ client: form, order, payMode, totals: { sub, volDis, disRate, payDis, final, totalQty, payLabel } }),
     }).catch(err => console.error('Order logging failed:', err))
 
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank')

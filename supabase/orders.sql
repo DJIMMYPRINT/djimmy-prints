@@ -1,29 +1,27 @@
--- Run this once in the Supabase SQL editor for the project referenced by
--- SUPABASE_URL, before /api/orders receives traffic.
+-- Reference only — this table already exists in the Supabase project
+-- (created before /api/orders was wired up) and does NOT need to be
+-- re-run. Documented here so the column names in pages/api/orders.js
+-- make sense without opening the Supabase dashboard.
 
-create table if not exists orders (
-  id uuid primary key default gen_random_uuid(),
-  nom text not null,
-  entreprise text,
-  tel text not null,
-  email text,
-  wilaya text,
-  adresse text,
-  produits jsonb not null,
-  technique text,
-  logo_name text,
-  notes text,
-  paiement text,
-  quantite_totale integer,
-  sous_total integer,
-  total integer,
-  created_at timestamptz not null default now()
-);
-
-create index if not exists orders_created_at_idx on orders (created_at desc);
-
--- Row-level security stays on by default; /api/orders writes through the
--- service role key, which bypasses RLS, so no policy is required for it to
--- function. Add a policy here only if you also want to read this table
--- from the browser with the anon key (e.g. an internal sales dashboard).
-alter table orders enable row level security;
+-- create table orders (
+--   id uuid primary key default gen_random_uuid(),
+--   created_at timestamptz not null default now(),
+--   status text,
+--   nom text,
+--   telephone text,
+--   entreprise text,
+--   email text,
+--   wilaya text,
+--   adresse text,
+--   technique text,
+--   logo_filename text,
+--   notes text,
+--   line_items jsonb,
+--   pay_mode text,
+--   subtotal integer,
+--   volume_discount_rate numeric,
+--   volume_discount_amount integer,
+--   payment_discount_amount integer,
+--   total_qty integer,
+--   total integer
+-- );

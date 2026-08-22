@@ -11,26 +11,33 @@ export default async function handler(req, res) {
     return
   }
 
-  const { client, order, totals } = req.body || {}
+  const { client, order, totals, payMode } = req.body || {}
   if (!client?.nom || !client?.tel || !Array.isArray(order?.prods) || order.prods.length === 0) {
     res.status(400).json({ error: 'Champs requis manquants.' })
     return
   }
 
+  // Column names match the pre-existing `orders` table in this Supabase
+  // project (see supabase/orders.sql), not the field names used in the
+  // wizard's own state (e.g. `tel` -> `telephone`, `logoName` -> `logo_filename`).
   const { error } = await supabaseAdmin.from('orders').insert({
+    status: 'nouveau',
     nom: client.nom,
+    telephone: client.tel,
     entreprise: client.entreprise || null,
-    tel: client.tel,
     email: client.email || null,
     wilaya: client.wilaya || null,
     adresse: client.adresse || null,
-    produits: order.prods,
     technique: order.technique || null,
-    logo_name: order.logoName || null,
+    logo_filename: order.logoName || null,
     notes: order.notes || null,
-    paiement: totals?.payLabel || null,
-    quantite_totale: totals?.totalQty ?? null,
-    sous_total: totals?.sub ?? null,
+    line_items: order.prods,
+    pay_mode: payMode || null,
+    subtotal: totals?.sub ?? null,
+    volume_discount_rate: totals?.disRate ?? null,
+    volume_discount_amount: totals?.volDis ?? null,
+    payment_discount_amount: totals?.payDis ?? null,
+    total_qty: totals?.totalQty ?? null,
     total: totals?.final ?? null,
   })
 
