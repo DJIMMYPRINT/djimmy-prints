@@ -20,6 +20,15 @@ export default function Commande() {
   const [selProd, setSelProd] = useState(PRODUCTS[0])
   const [selColor, setSelColor] = useState('Blanc')
   const [selSizes, setSelSizes] = useState({})
+  const [expandedProduct, setExpandedProduct] = useState(null)
+
+  const toggleExpand = (p) => {
+    if(expandedProduct === p.name) { setExpandedProduct(null); return }
+    setExpandedProduct(p.name)
+    setSelProd(p)
+    setSelColor('Blanc')
+    setSelSizes({})
+  }
 
   const addProduct = () => {
     const totalQty = Object.values(selSizes).reduce((a,b)=>a+(+b||0),0)
@@ -29,6 +38,7 @@ export default function Commande() {
       prods: [...o.prods, { ...selProd, qty: totalQty, color: selColor, sizes: {...selSizes} }]
     }))
     setSelSizes({})
+    setExpandedProduct(null)
   }
 
   const removeProduct = (i) => setOrder(o=>({...o,prods:o.prods.filter((_,idx)=>idx!==i)}))
@@ -172,93 +182,113 @@ export default function Commande() {
               <div>
                 <h3 style={{fontFamily:'Anton',fontSize:'1.2rem',textTransform:'uppercase',marginBottom:'1.5rem'}}>1. Choisissez vos produits</h3>
 
-                {/* Product picker */}
+                {/* Product picker — tap a card to expand it inline with color/size/add controls,
+                    right where you clicked, instead of scrolling to a shared panel below the grid */}
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'1.2rem',marginBottom:'2rem'}}>
-                  {PRODUCTS.map(p => (
-                    <div key={p.name} onClick={()=>setSelProd(p)} style={{
-                      border:'1.5px solid', borderRadius:'10px', cursor:'pointer',
-                      overflow:'hidden', background:'var(--white)', transition:'all .2s',
-                      borderColor: selProd.name===p.name ? 'var(--green)' : 'var(--cream-border)',
-                      boxShadow: selProd.name===p.name ? 'var(--shadow)' : 'none',
-                      position:'relative',
-                    }}>
-                      {selProd.name===p.name && (
-                        <span style={{
-                          position:'absolute', top:10, right:10, zIndex:1,
-                          width:24, height:24, borderRadius:'50%', background:'var(--green)',
-                          color:'var(--white)', display:'flex', alignItems:'center', justifyContent:'center',
-                          fontSize:'.75rem', fontWeight:700,
-                        }}>✓</span>
-                      )}
-                      {p.popular && (
-                        <span style={{
-                          position:'absolute', top:10, left:10, zIndex:1,
-                          background:'var(--gold)', color:'var(--white)',
-                          fontSize:'.6rem', fontWeight:700, padding:'.2rem .6rem', borderRadius:'100px',
-                          letterSpacing:'.08em', textTransform:'uppercase',
-                        }}>Populaire</span>
-                      )}
-                      {/* Image / mockup area — real product photo from Supabase, emoji fallback if it fails to load */}
-                      <div style={{
-                        aspectRatio:'4/3', background:'var(--cream-dark)',
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        overflow:'hidden',
+                  {PRODUCTS.map(p => {
+                    const isExpanded = expandedProduct === p.name
+                    const inCart = order.prods.some(op => op.name === p.name)
+                    return (
+                      <div key={p.name} style={{
+                        border:'1.5px solid', borderRadius:'10px',
+                        overflow:'hidden', background:'var(--white)', transition:'all .2s',
+                        borderColor: isExpanded ? 'var(--green)' : 'var(--cream-border)',
+                        boxShadow: isExpanded ? 'var(--shadow)' : 'none',
+                        position:'relative',
+                        gridColumn: isExpanded ? '1 / -1' : undefined,
                       }}>
-                        <img
-                          src={`${SUPABASE_IMG_BASE}/${p.photo}`}
-                          alt={p.name}
-                          style={{width:'100%',height:'100%',objectFit:'cover'}}
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none'
-                            e.currentTarget.nextSibling.style.display = 'flex'
-                          }}
-                        />
-                        <span style={{fontSize:'4.2rem',display:'none'}}>{p.emoji}</span>
-                      </div>
-                      <div style={{padding:'1rem 1.1rem'}}>
-                        <div style={{fontFamily:'Anton',fontSize:'1.05rem',textTransform:'uppercase',letterSpacing:'.02em',marginBottom:'.3rem'}}>{p.name}</div>
-                        <div style={{fontSize:'.78rem',color:'var(--muted)',lineHeight:1.5,marginBottom:'.6rem',minHeight:'2.2em'}}>{p.desc}</div>
-                        <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:'var(--green)'}}>
-                          {p.price.toLocaleString('fr-DZ')} DA <span style={{fontFamily:'Inter',fontSize:'.68rem',color:'var(--muted)',fontWeight:500,textTransform:'none',letterSpacing:0}}>/ pièce</span>
+                        <div onClick={()=>toggleExpand(p)} style={{cursor:'pointer'}}>
+                          {isExpanded && (
+                            <span style={{
+                              position:'absolute', top:10, right:10, zIndex:1,
+                              width:24, height:24, borderRadius:'50%', background:'var(--green)',
+                              color:'var(--white)', display:'flex', alignItems:'center', justifyContent:'center',
+                              fontSize:'.75rem', fontWeight:700,
+                            }}>✓</span>
+                          )}
+                          {p.popular && (
+                            <span style={{
+                              position:'absolute', top:10, left:10, zIndex:1,
+                              background:'var(--gold)', color:'var(--white)',
+                              fontSize:'.6rem', fontWeight:700, padding:'.2rem .6rem', borderRadius:'100px',
+                              letterSpacing:'.08em', textTransform:'uppercase',
+                            }}>Populaire</span>
+                          )}
+                          {inCart && !isExpanded && (
+                            <span style={{
+                              position:'absolute', top:10, right:10, zIndex:1,
+                              background:'var(--green)', color:'var(--white)',
+                              fontSize:'.6rem', fontWeight:700, padding:'.2rem .6rem', borderRadius:'100px',
+                              letterSpacing:'.08em', textTransform:'uppercase',
+                            }}>Ajouté ✓</span>
+                          )}
+                          {/* Image / mockup area — real product photo from Supabase, emoji fallback if it fails to load */}
+                          <div style={{
+                            aspectRatio:'4/3', background:'var(--cream-dark)',
+                            display:'flex', alignItems:'center', justifyContent:'center',
+                            overflow:'hidden',
+                          }}>
+                            <img
+                              src={`${SUPABASE_IMG_BASE}/${p.photo}`}
+                              alt={p.name}
+                              style={{width:'100%',height:'100%',objectFit:'cover'}}
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none'
+                                e.currentTarget.nextSibling.style.display = 'flex'
+                              }}
+                            />
+                            <span style={{fontSize:'4.2rem',display:'none'}}>{p.emoji}</span>
+                          </div>
+                          <div style={{padding:'1rem 1.1rem'}}>
+                            <div style={{fontFamily:'Anton',fontSize:'1.05rem',textTransform:'uppercase',letterSpacing:'.02em',marginBottom:'.3rem'}}>{p.name}</div>
+                            <div style={{fontSize:'.78rem',color:'var(--muted)',lineHeight:1.5,marginBottom:'.6rem',minHeight:'2.2em'}}>{p.desc}</div>
+                            <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:'var(--green)'}}>
+                              {p.price.toLocaleString('fr-DZ')} DA <span style={{fontFamily:'Inter',fontSize:'.68rem',color:'var(--muted)',fontWeight:500,textTransform:'none',letterSpacing:0}}>/ pièce</span>
+                            </div>
+                          </div>
                         </div>
+
+                        {isExpanded && (
+                          <div style={{padding:'0 1.1rem 1.3rem'}}>
+                            {/* Color */}
+                            <div style={{marginBottom:'1rem'}}>
+                              <label style={labelStyle}>Couleur</label>
+                              <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
+                                {COLORS.map(c=>(
+                                  <button key={c} onClick={()=>setSelColor(c)} style={{
+                                    padding:'.3rem .8rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',fontWeight:500,
+                                    borderColor:selColor===c?'var(--green)':'var(--cream-border)',
+                                    background:selColor===c?'var(--green)':'var(--cream)',
+                                    color:selColor===c?'var(--white)':'var(--black)',
+                                  }}>{c}</button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Sizes */}
+                            <div style={{marginBottom:'1.2rem'}}>
+                              <label style={labelStyle}>Quantités par taille</label>
+                              <div className="size-grid" style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'.5rem'}}>
+                                {SIZES.map(s=>(
+                                  <div key={s} style={{textAlign:'center'}}>
+                                    <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--muted)',marginBottom:'.3rem'}}>{s}</div>
+                                    <input type="number" min="0" max="9999" value={selSizes[s]||''} placeholder="0"
+                                      onChange={e=>setSelSizes(sz=>({...sz,[s]:+e.target.value||0}))}
+                                      style={{...inputStyle,padding:'.5rem',textAlign:'center',fontSize:'.85rem'}} />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <button onClick={addProduct} className="btn-g" style={{width:'100%',justifyContent:'center'}}>
+                              + Ajouter au panier
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
-
-                {/* Color */}
-                <div style={{marginBottom:'1.2rem'}}>
-                  <label style={labelStyle}>Couleur</label>
-                  <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
-                    {COLORS.map(c=>(
-                      <button key={c} onClick={()=>setSelColor(c)} style={{
-                        padding:'.3rem .8rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',fontWeight:500,
-                        borderColor:selColor===c?'var(--green)':'var(--cream-border)',
-                        background:selColor===c?'var(--green)':'var(--cream)',
-                        color:selColor===c?'var(--white)':'var(--black)',
-                      }}>{c}</button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Sizes */}
-                <div style={{marginBottom:'1.5rem'}}>
-                  <label style={labelStyle}>Quantités par taille</label>
-                  <div className="size-grid" style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'.5rem'}}>
-                    {SIZES.map(s=>(
-                      <div key={s} style={{textAlign:'center'}}>
-                        <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--muted)',marginBottom:'.3rem'}}>{s}</div>
-                        <input type="number" min="0" max="9999" value={selSizes[s]||''} placeholder="0"
-                          onChange={e=>setSelSizes(sz=>({...sz,[s]:+e.target.value||0}))}
-                          style={{...inputStyle,padding:'.5rem',textAlign:'center',fontSize:'.85rem'}} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button onClick={addProduct} className="btn-outline" style={{marginBottom:'2rem'}}>
-                  + Ajouter au panier
-                </button>
 
                 {/* Added products */}
                 {order.prods.length>0 && (
