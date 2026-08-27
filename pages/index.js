@@ -89,7 +89,7 @@ export default function Catalogue() {
       </div>
 
       <div style={{padding:'0 4vw 6rem',position:'relative',zIndex:1}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 420px',gap:'4rem',alignItems:'start'}}>
+        <div className="cat-layout" style={{display:'grid',gridTemplateColumns:'1fr 420px',gap:'4rem',alignItems:'start'}}>
 
           {/* GAUCHE — Liste produits */}
           <div>

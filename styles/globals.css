@@ -232,6 +232,7 @@ body {
   .wizard-layout { grid-template-columns: 1fr !important; gap: 2rem !important; }
   .wizard-summary { position: static !important; }
   .cat-layout { grid-template-columns: 1fr !important; gap: 2.5rem !important; }
+  .cat-layout > div { position: static !important; }
 }
 
 @media (max-width: 800px) {

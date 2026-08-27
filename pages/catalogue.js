@@ -17,23 +17,31 @@ export default function Catalogue() {
   const [dragOver, setDragOver] = useState(false)
   const canvasRef = useRef(null)
 
-  // Logo drag inside canvas
-  const handleCanvasMouseDown = (e) => {
-    if (!logoSrc) return
+  // Logo drag inside canvas — shared by mouse and touch input
+  const dragToCanvasPoint = (clientX, clientY) => {
     const rect = canvasRef.current.getBoundingClientRect()
-    const cx = ((e.clientX - rect.left) / rect.width) * 100
-    const cy = ((e.clientY - rect.top) / rect.height) * 100
+    return { x: ((clientX - rect.left) / rect.width) * 100, y: ((clientY - rect.top) / rect.height) * 100 }
+  }
+  const startDrag = (clientX, clientY) => {
+    if (!logoSrc) return
+    const { x: cx, y: cy } = dragToCanvasPoint(clientX, clientY)
     setIsDragging(true)
     setDragStart({ x: cx - logoPos.x, y: cy - logoPos.y })
   }
-  const handleCanvasMouseMove = (e) => {
+  const moveDrag = (clientX, clientY) => {
     if (!isDragging || !dragStart) return
-    const rect = canvasRef.current.getBoundingClientRect()
-    const cx = ((e.clientX - rect.left) / rect.width) * 100
-    const cy = ((e.clientY - rect.top) / rect.height) * 100
+    const { x: cx, y: cy } = dragToCanvasPoint(clientX, clientY)
     setLogoPos({ x: Math.min(85, Math.max(5, cx - dragStart.x)), y: Math.min(85, Math.max(5, cy - dragStart.y)) })
   }
-  const handleCanvasMouseUp = () => { setIsDragging(false); setDragStart(null) }
+  const endDrag = () => { setIsDragging(false); setDragStart(null) }
+
+  const handleCanvasMouseDown = (e) => startDrag(e.clientX, e.clientY)
+  const handleCanvasMouseMove = (e) => moveDrag(e.clientX, e.clientY)
+  const handleCanvasMouseUp = () => endDrag()
+
+  const handleCanvasTouchStart = (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY)
+  const handleCanvasTouchMove = (e) => moveDrag(e.touches[0].clientX, e.touches[0].clientY)
+  const handleCanvasTouchEnd = () => endDrag()
 
   const handleFileInput = (files) => {
     const f = files[0]
@@ -138,11 +146,15 @@ export default function Catalogue() {
                 display:'flex', alignItems:'center', justifyContent:'center',
                 cursor: logoSrc ? 'grab' : 'default',
                 userSelect:'none',
+                touchAction: logoSrc ? 'none' : 'auto',
               }}
               onMouseDown={handleCanvasMouseDown}
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleCanvasMouseUp}
               onMouseLeave={handleCanvasMouseUp}
+              onTouchStart={handleCanvasTouchStart}
+              onTouchMove={handleCanvasTouchMove}
+              onTouchEnd={handleCanvasTouchEnd}
             >
               {photoFailed ? (
                 <span style={{fontSize:'12rem',userSelect:'none',pointerEvents:'none'}}>{activeProduct.emoji}</span>
