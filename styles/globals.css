@@ -258,3 +258,11 @@ body {
 @media (max-width: 440px) {
   .footer-grid { grid-template-columns: 1fr !important; }
 }
+
+@media (max-width: 900px) {
+  .ent-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 560px) {
+  .ent-grid { grid-template-columns: 1fr !important; }
+}

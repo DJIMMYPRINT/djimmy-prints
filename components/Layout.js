@@ -55,6 +55,7 @@ export default function Layout({ children }) {
           {[
             { label: 'Accueil', href: '/' },
             { label: 'Catalogue', href: '/catalogue' },
+            { label: 'Entreprises', href: '/entreprises' },
             { label: 'Commande', href: '/commande' },
             { label: 'Contact', href: '/contact' },
           ].map(({ label, href }) => (
@@ -118,6 +119,7 @@ export default function Layout({ children }) {
           {[
             { label: 'Accueil', href: '/' },
             { label: 'Catalogue', href: '/catalogue' },
+            { label: 'Entreprises', href: '/entreprises' },
             { label: 'Commande', href: '/commande' },
             { label: 'Contact', href: '/contact' },
           ].map(({ label, href }) => (
@@ -166,7 +168,7 @@ export default function Layout({ children }) {
           {/* Navigation */}
           <div>
             <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Navigation</p>
-            {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Contact','/contact']].map(([label,href]) => (
+            {[['Accueil','/'],['Catalogue','/catalogue'],['Entreprises','/entreprises'],['Commander','/commande'],['Contact','/contact']].map(([label,href]) => (
               <Link key={href} href={href} style={{display:'block',fontSize:'.85rem',color:'rgba(245,240,232,.6)',textDecoration:'none',marginBottom:'.5rem',transition:'color .2s'}}
                 onMouseOver={e=>e.currentTarget.style.color='var(--cream)'}
                 onMouseOut={e=>e.currentTarget.style.color='rgba(245,240,232,.6)'}>
