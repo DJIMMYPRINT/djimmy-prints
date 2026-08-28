@@ -95,6 +95,20 @@ export default function Commande() {
 
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank')
     if(typeof fbq!=='undefined') fbq('track','Purchase',{value:final,currency:'DZD'})
+
+    // Best-effort backend record — WhatsApp stays the source of truth for the
+    // customer conversation, this just gives the back-office a copy to work from.
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nom: form.nom, entreprise: form.entreprise, tel: `+213${form.tel}`, email: form.email,
+        wilaya: form.wilaya, adresse: form.adresse,
+        produits: order.prods, technique: order.technique, logoName: order.logoName, notes: order.notes,
+        paiement: payLabel, quantiteTotale: totalQty, sousTotal: sub, total: final,
+      }),
+    }).catch(e => console.error('Order backend save failed', e))
+
     setDone(true)
   }
 
