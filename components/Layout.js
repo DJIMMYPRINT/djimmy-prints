@@ -55,6 +55,7 @@ export default function Layout({ children }) {
           {[
             { label: 'Accueil', href: '/' },
             { label: 'Catalogue', href: '/catalogue' },
+            { label: 'Entreprises', href: '/entreprises' },
             { label: 'Commande', href: '/commande' },
             { label: 'Contact', href: '/contact' },
           ].map(({ label, href }) => (
@@ -76,6 +77,17 @@ export default function Layout({ children }) {
               </Link>
             </li>
           ))}
+          <li>
+            <Link href="/compte" style={{
+              color: isActive('/compte') ? 'var(--black)' : 'var(--muted)',
+              textDecoration: 'none', fontSize: '.75rem', fontWeight: 500,
+              letterSpacing: '.1em', textTransform: 'uppercase',
+              padding: '.45rem 1.1rem', display: 'block',
+              borderBottom: isActive('/compte') ? '1.5px solid var(--green)' : 'none',
+            }}>
+              Compte
+            </Link>
+          </li>
           <li>
             <a
               href={`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`}
@@ -118,8 +130,10 @@ export default function Layout({ children }) {
           {[
             { label: 'Accueil', href: '/' },
             { label: 'Catalogue', href: '/catalogue' },
+            { label: 'Entreprises', href: '/entreprises' },
             { label: 'Commande', href: '/commande' },
             { label: 'Contact', href: '/contact' },
+            { label: 'Mon compte', href: '/compte' },
           ].map(({ label, href }) => (
             <Link key={href} href={href} className={isActive(href) ? 'active' : ''} onClick={() => setMenuOpen(false)}>
               {label}
@@ -166,7 +180,7 @@ export default function Layout({ children }) {
           {/* Navigation */}
           <div>
             <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Navigation</p>
-            {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Contact','/contact']].map(([label,href]) => (
+            {[['Accueil','/'],['Catalogue','/catalogue'],['Entreprises','/entreprises'],['Commander','/commande'],['Contact','/contact']].map(([label,href]) => (
               <Link key={href} href={href} style={{display:'block',fontSize:'.85rem',color:'rgba(245,240,232,.6)',textDecoration:'none',marginBottom:'.5rem',transition:'color .2s'}}
                 onMouseOver={e=>e.currentTarget.style.color='var(--cream)'}
                 onMouseOut={e=>e.currentTarget.style.color='rgba(245,240,232,.6)'}>

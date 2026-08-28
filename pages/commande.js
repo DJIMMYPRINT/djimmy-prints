@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS, SUPABASE_IMG_BASE } from '../lib/constants'
+import { getSupabaseBrowser } from '../lib/supabaseBrowser'
 
 export default function Commande() {
   const [step, setStep] = useState(1)
@@ -95,6 +96,33 @@ export default function Commande() {
 
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank')
     if(typeof fbq!=='undefined') fbq('track','Purchase',{value:final,currency:'DZD'})
+
+    // Best-effort backend record — WhatsApp stays the source of truth for the
+    // customer conversation, this just gives the back-office a copy to work
+    // from (and links it to the customer's account when they're logged in).
+    ;(async () => {
+      try {
+        let authHeader = {}
+        try {
+          const { data: { session } } = await getSupabaseBrowser().auth.getSession()
+          if (session) authHeader = { Authorization: `Bearer ${session.access_token}` }
+        } catch { /* account system not configured yet — order still saves as guest */ }
+
+        await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader },
+          body: JSON.stringify({
+            nom: form.nom, entreprise: form.entreprise, tel: `+213${form.tel}`, email: form.email,
+            wilaya: form.wilaya, adresse: form.adresse,
+            produits: order.prods, technique: order.technique, logoName: order.logoName, notes: order.notes,
+            paiement: payLabel, quantiteTotale: totalQty, sousTotal: sub, total: final,
+          }),
+        })
+      } catch (e) {
+        console.error('Order backend save failed', e)
+      }
+    })()
+
     setDone(true)
   }
 
@@ -135,23 +163,38 @@ export default function Commande() {
         <p className="s-lbl">Wizard commande</p>
         <h1 className="s-ttl">Configurez votre <span className="kw">commande</span></h1>
 
-        {/* Steps indicator */}
-        <div style={{display:'flex',gap:0,marginTop:'2rem',marginBottom:'3rem',maxWidth:500}}>
-          {['Produits','Personnalisation','Livraison & Paiement'].map((s,i) => (
-            <div key={s} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'.4rem',cursor:'pointer'}} onClick={()=>{ if(i<step-1) setStep(i+1) }}>
-              <div style={{
-                width:32,height:32,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
-                fontWeight:700,fontSize:'.8rem',
-                background: step>i+1 ? 'var(--green)' : step===i+1 ? 'var(--green)' : 'var(--cream-border)',
-                color: step>=i+1 ? 'var(--white)' : 'var(--muted)',
-                transition:'all .3s',
-              }}>
-                {step>i+1 ? '✓' : i+1}
+        {/* Steps indicator — sticky with a live running total, so the price stays visible
+            while scrolling the product list on mobile (it used to only show in the
+            right-side summary card, which sits below the form once stacked) */}
+        <div style={{
+          position:'sticky', top:'96px', zIndex:10,
+          background:'var(--cream)', paddingTop:'.6rem', paddingBottom:'.6rem',
+          marginTop:'2rem', marginBottom:'2rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between', gap:'1.5rem', flexWrap:'wrap',
+        }}>
+          <div style={{display:'flex',gap:0,maxWidth:500,flex:1,minWidth:260}}>
+            {['Produits','Personnalisation','Livraison & Paiement'].map((s,i) => (
+              <div key={s} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'.4rem',cursor:'pointer'}} onClick={()=>{ if(i<step-1) setStep(i+1) }}>
+                <div style={{
+                  width:32,height:32,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
+                  fontWeight:700,fontSize:'.8rem',
+                  background: step>i+1 ? 'var(--green)' : step===i+1 ? 'var(--green)' : 'var(--cream-border)',
+                  color: step>=i+1 ? 'var(--white)' : 'var(--muted)',
+                  transition:'all .3s',
+                }}>
+                  {step>i+1 ? '✓' : i+1}
+                </div>
+                <div style={{fontSize:'.68rem',fontWeight:600,color:step===i+1?'var(--green)':'var(--muted)',textAlign:'center',textTransform:'uppercase',letterSpacing:'.06em'}}>{s}</div>
+                {i<2 && <div style={{position:'absolute',width:'calc(33% - 32px)',height:'2px',background:step>i+1?'var(--green)':'var(--cream-border)',marginTop:'16px',marginLeft:'calc(16px + 33%)'}} />}
               </div>
-              <div style={{fontSize:'.68rem',fontWeight:600,color:step===i+1?'var(--green)':'var(--muted)',textAlign:'center',textTransform:'uppercase',letterSpacing:'.06em'}}>{s}</div>
-              {i<2 && <div style={{position:'absolute',width:'calc(33% - 32px)',height:'2px',background:step>i+1?'var(--green)':'var(--cream-border)',marginTop:'16px',marginLeft:'calc(16px + 33%)'}} />}
+            ))}
+          </div>
+          {order.prods.length>0 && (
+            <div style={{textAlign:'right',flexShrink:0}}>
+              <div style={{fontSize:'.62rem',color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em'}}>Total ({totalQty} pcs)</div>
+              <div style={{fontFamily:'Anton',fontSize:'1.3rem',color:'var(--green)',lineHeight:1}}>{final.toLocaleString()} DA</div>
             </div>
-          ))}
+          )}
         </div>
 
         <div className="wizard-layout" style={{display:'grid',gridTemplateColumns:'1fr 380px',gap:'3rem',alignItems:'start'}}>
