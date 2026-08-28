@@ -78,6 +78,17 @@ export default function Layout({ children }) {
             </li>
           ))}
           <li>
+            <Link href="/compte" style={{
+              color: isActive('/compte') ? 'var(--black)' : 'var(--muted)',
+              textDecoration: 'none', fontSize: '.75rem', fontWeight: 500,
+              letterSpacing: '.1em', textTransform: 'uppercase',
+              padding: '.45rem 1.1rem', display: 'block',
+              borderBottom: isActive('/compte') ? '1.5px solid var(--green)' : 'none',
+            }}>
+              Compte
+            </Link>
+          </li>
+          <li>
             <a
               href={`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`}
               target="_blank" rel="noopener noreferrer"
@@ -122,6 +133,7 @@ export default function Layout({ children }) {
             { label: 'Entreprises', href: '/entreprises' },
             { label: 'Commande', href: '/commande' },
             { label: 'Contact', href: '/contact' },
+            { label: 'Mon compte', href: '/compte' },
           ].map(({ label, href }) => (
             <Link key={href} href={href} className={isActive(href) ? 'active' : ''} onClick={() => setMenuOpen(false)}>
               {label}

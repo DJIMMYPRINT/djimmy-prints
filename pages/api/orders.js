@@ -16,10 +16,22 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Champs obligatoires manquants' })
   }
 
-  const { data, error } = await getSupabaseAdmin()
+  const admin = getSupabaseAdmin()
+
+  // Optional: attach the order to a business account when the customer is
+  // logged in. Guest checkout (no Authorization header) still works.
+  let userId = null
+  const token = (req.headers.authorization || '').replace('Bearer ', '')
+  if (token) {
+    const { data: userData } = await admin.auth.getUser(token)
+    if (userData?.user) userId = userData.user.id
+  }
+
+  const { data, error } = await admin
     .from('orders')
     .insert({
       nom, tel,
+      user_id: userId,
       entreprise: entreprise || null,
       email: email || null,
       wilaya: wilaya || null,

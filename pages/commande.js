@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS, SUPABASE_IMG_BASE } from '../lib/constants'
+import { getSupabaseBrowser } from '../lib/supabaseBrowser'
 
 export default function Commande() {
   const [step, setStep] = useState(1)
@@ -97,17 +98,30 @@ export default function Commande() {
     if(typeof fbq!=='undefined') fbq('track','Purchase',{value:final,currency:'DZD'})
 
     // Best-effort backend record — WhatsApp stays the source of truth for the
-    // customer conversation, this just gives the back-office a copy to work from.
-    fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nom: form.nom, entreprise: form.entreprise, tel: `+213${form.tel}`, email: form.email,
-        wilaya: form.wilaya, adresse: form.adresse,
-        produits: order.prods, technique: order.technique, logoName: order.logoName, notes: order.notes,
-        paiement: payLabel, quantiteTotale: totalQty, sousTotal: sub, total: final,
-      }),
-    }).catch(e => console.error('Order backend save failed', e))
+    // customer conversation, this just gives the back-office a copy to work
+    // from (and links it to the customer's account when they're logged in).
+    ;(async () => {
+      try {
+        let authHeader = {}
+        try {
+          const { data: { session } } = await getSupabaseBrowser().auth.getSession()
+          if (session) authHeader = { Authorization: `Bearer ${session.access_token}` }
+        } catch { /* account system not configured yet — order still saves as guest */ }
+
+        await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader },
+          body: JSON.stringify({
+            nom: form.nom, entreprise: form.entreprise, tel: `+213${form.tel}`, email: form.email,
+            wilaya: form.wilaya, adresse: form.adresse,
+            produits: order.prods, technique: order.technique, logoName: order.logoName, notes: order.notes,
+            paiement: payLabel, quantiteTotale: totalQty, sousTotal: sub, total: final,
+          }),
+        })
+      } catch (e) {
+        console.error('Order backend save failed', e)
+      }
+    })()
 
     setDone(true)
   }
