@@ -76,7 +76,14 @@ qui reconnaît le plus de mots-clés l'emporte ; une expression de plusieurs mot
 pèse plus qu'un mot isolé (« combien de temps » l'emporte sur « combien »). Si
 rien ne correspond, `FALLBACK` répond sans rien inventer et renvoie vers WhatsApp.
 
-Après modification, vérifiez le rendu sur `/auto-reponses`, puis `npm run build`
+Une règle peut aussi porter une liste `strong` : des mots sans ambiguïté
+(« devis », « échantillon ») qui pèsent quatre fois, pour qu'une tournure
+générique d'une autre règle (« je voudrais… ») ne passe pas devant le mot qui
+dit vraiment ce que le client demande.
+
+Après modification, lancez **`npm test`** (`scripts/autoreply.test.mjs`, sans
+aucune dépendance : il vérifie que chaque message type tombe toujours sur la
+bonne règle), vérifiez le rendu sur `/auto-reponses`, puis `npm run build`
 avant de déployer.
 
 ## TikTok et LinkedIn
