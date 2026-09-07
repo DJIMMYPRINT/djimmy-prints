@@ -1,8 +1,8 @@
 import Head from 'next/head'
-import { WA, PHONE_DISPLAY, EMAIL, ADDRESS } from '../lib/constants'
+import { WA, PHONE_DISPLAY, EMAIL, ADDRESS, HOURS, MIN_ORDER } from '../lib/constants'
 
 const FAQ = [
-  { q: 'Quel est le minimum de commande ?', r: '20 pièces minimum. Pour les commandes inférieures, contactez-nous pour un devis personnalisé.' },
+  { q: 'Quel est le minimum de commande ?', r: `${MIN_ORDER} pièces minimum. Pour les commandes inférieures, contactez-nous pour un devis personnalisé.` },
   { q: 'Combien de temps pour recevoir ma commande ?', r: 'Entre 3 et 7 jours ouvrables selon votre wilaya et la complexité de la personnalisation.' },
   { q: 'Proposez-vous des contrats annuels ?', r: 'Oui. Nous offrons des tarifs préférentiels pour les contrats annuels avec renouvellement régulier.' },
   { q: 'Puis-je voir un échantillon avant de commander ?', r: 'Oui, contactez-nous sur WhatsApp. Nous vous envoyons des photos de réalisations similaires avant engagement.' },
@@ -60,11 +60,7 @@ export default function Contact() {
             {/* Horaires */}
             <div style={{marginTop:'2rem',padding:'1.5rem',background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'8px'}}>
               <div style={{fontFamily:'Anton',fontSize:'.9rem',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'1rem'}}>🕐 Horaires</div>
-              {[
-                ['Dimanche – Jeudi', '8h00 – 18h00'],
-                ['Vendredi', '8h00 – 12h00'],
-                ['Samedi', 'Sur RDV'],
-              ].map(([j,h])=>(
+              {HOURS.map(([j,h])=>(
                 <div key={j} style={{display:'flex',justifyContent:'space-between',fontSize:'.85rem',marginBottom:'.6rem'}}>
                   <span style={{color:'var(--muted)'}}>{j}</span>
                   <span style={{fontWeight:600}}>{h}</span>
